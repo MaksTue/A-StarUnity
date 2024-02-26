@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils;
 
 public class PathNode //: MonoBehaviour
 {
@@ -21,6 +23,7 @@ public class PathNode //: MonoBehaviour
     }
 
     private float distance = float.PositiveInfinity;  //  расстояние от начальной вершины
+    private float heuristic = float.PositiveInfinity;
 
     /// <summary>
     /// Расстояние от начальной вершины до текущей (+infinity если ещё не развёртывали)
@@ -29,6 +32,12 @@ public class PathNode //: MonoBehaviour
     {
         get => distance;
         set => distance = value;
+    }
+
+    public float Heur
+    {
+        get => heuristic;
+        set => heuristic = value;
     }
 
     /// <summary>
@@ -68,7 +77,7 @@ public class PathNode //: MonoBehaviour
     /// <returns></returns>
     public static float Dist(PathNode a, PathNode b)
     {
-        return Vector3.Distance(a.body.transform.position, b.body.transform.position) + 40 * Mathf.Abs(a.body.transform.position.y - b.body.transform.position.y);
+        return Vector3.Distance(a.body.transform.position, b.body.transform.position) + 100 * Mathf.Abs(a.body.transform.position.y - b.body.transform.position.y);
     }
     
     /// <summary>
@@ -76,9 +85,14 @@ public class PathNode //: MonoBehaviour
     /// </summary>
     public void Illuminate()
     {
+        body.GetComponent<Renderer>().material.color = Color.green;
+    }
+
+    public void IlluminateNotWalkable()
+    {
         body.GetComponent<Renderer>().material.color = Color.red;
     }
-    
+
     /// <summary>
     /// Снять подсветку с вершины - перекрасить в синий
     /// </summary>
@@ -86,4 +100,10 @@ public class PathNode //: MonoBehaviour
     {
         body.GetComponent<Renderer>().material.color = Color.blue;
     }
+
+    public static float Heuristic(PathNode currentNode, PathNode finishNode)
+    {
+        return Math.Max(Math.Abs(currentNode.body.transform.position.x - finishNode.body.transform.position.x), Math.Abs(currentNode.body.transform.position.y - finishNode.body.transform.position.y));
+    }
+
 }
